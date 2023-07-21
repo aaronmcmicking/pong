@@ -1,6 +1,5 @@
 /*
  * Simple pong clone using raylib
- *
  */
 
 #include <raylib.h>
@@ -57,8 +56,8 @@ struct Score{
     size_t right;
 };
 
-typedef struct GameLogicInfo GameLogicInfo;
-struct GameLogicInfo{
+typedef struct LogicReturnInfo LogicReturnInfo;
+struct LogicReturnInfo{
     enum SCREEN next_screen;
     enum WIN_SIDE winner; // NULL if next_screen != GAME_OVER
 };
@@ -70,7 +69,7 @@ void init_objects(Paddle* lp, Paddle* rp, Ball* b);
 
 enum SCREEN process_logic(Paddle* lp, Paddle* rp, Ball* b, Score* s);
 void update_paddle(Paddle* p);
-GameLogicInfo update_ball(Ball* b, Paddle lp, Paddle rp);
+LogicReturnInfo update_ball(Ball* b, Paddle lp, Paddle rp);
 void update_score(Score* s, enum WIN_SIDE winner);
 
 void render(Paddle lp, Paddle rp, Ball b, Score score, enum SCREEN screen);

@@ -1,22 +1,8 @@
-#define _DEFAULT_SOURCE // includes definition of usleep(s) in unistd.h
-#include <unistd.h>
 #ifdef __linux__
+    #define _DEFAULT_SOURCE // includes definition of usleep(s) in unistd.h
     #include <unistd.h>
     #define sleep_ms(s) usleep(s*1000)
     #define sleep_s(s) sleep(s)
-#else
-#ifdef _WIN32
-    /* Macros resolve conflicting definitions in raylib.h and windows.h */
-    /* Sourced from github.com/raysan5/raylib/issues/1217 */
-    #define NOGDI             // All GDI defines and routines
-	#define NOUSER            // All USER defines and routines
-    #define WIN32_LEAN_AND_MEAN
-    #include <windows.h>
-    #undef near
-	#undef far
-    #define sleep_ms Sleep(s)
-    #define sleep_s(s) Sleep(s*1000)
-#endif // _WIN32
 #endif // __linux__
 
 #include "pong.h"
@@ -65,9 +51,10 @@ Paddle construct_paddle(int up_key, int down_key, enum WIN_SIDE side){
 
 Ball construct_ball(){
     float radius = WIN_WIDTH/90.0;
-    float v = 1200.0 / TARGET_FPS;
+    float yv = 1200.0 / TARGET_FPS;
+    float xv = yv * 1.1;
 
-    float init_y_vel = rand() % (int) v;
+    float init_y_vel = rand() % (int) yv;
 
     return (Ball){ 
 		.pos = (Vector2){
@@ -75,12 +62,12 @@ Ball construct_ball(){
                     .y = WIN_HEIGHT/2.0
                 }, 
 		.vel = (Vector2){ 
-					.x = v, 
+					.x = xv, 
 					.y = init_y_vel 
                 }, 
 		.base_vel = (Vector2){ 
-					.x = v, 
-					.y = v 
+					.x = xv, 
+					.y = yv 
                 }, 
 		.radius = radius 
     };
@@ -109,7 +96,7 @@ float calculate_ball_y_velocity(Ball b, Paddle p){
 enum SCREEN process_logic(Paddle* lp, Paddle* rp, Ball* b, Score* s){
     update_paddle(lp);
     update_paddle(rp);
-    GameLogicInfo frame_info = update_ball(b, *lp, *rp);
+    LogicReturnInfo frame_info = update_ball(b, *lp, *rp);
     enum SCREEN next_screen = frame_info.next_screen;
     if(next_screen == GAME_OVER){
         update_score(s, frame_info.winner);
@@ -177,7 +164,7 @@ void update_paddle(Paddle* p){
     }
 }
 
-GameLogicInfo update_ball(Ball* b, Paddle lp, Paddle rp){
+LogicReturnInfo update_ball(Ball* b, Paddle lp, Paddle rp){
     // bounce off top and bottom of screen
     bool ball_touching_top_of_screen = b->pos.y - b->radius <= 0;
     bool ball_touching_bottom_of_screen = b->pos.y + b->radius >= WIN_HEIGHT;
@@ -189,9 +176,9 @@ GameLogicInfo update_ball(Ball* b, Paddle lp, Paddle rp){
     bool ball_touching_left_wall = b->pos.x - b->radius <= 0;
     bool ball_touching_right_wall = b->pos.x + b->radius >= WIN_WIDTH;
     if(ball_touching_left_wall){
-        return (GameLogicInfo){.next_screen = GAME_OVER, .winner = RIGHT};
+        return (LogicReturnInfo){.next_screen = GAME_OVER, .winner = RIGHT};
     }else if(ball_touching_right_wall){
-        return (GameLogicInfo){.next_screen = GAME_OVER, .winner = LEFT};
+        return (LogicReturnInfo){.next_screen = GAME_OVER, .winner = LEFT};
     }
     
     // paddle collision detection
@@ -218,7 +205,7 @@ GameLogicInfo update_ball(Ball* b, Paddle lp, Paddle rp){
     // update position
     b->pos.x += b->vel.x;
     b->pos.y += b->vel.y;
-    return (GameLogicInfo){.next_screen = PLAYING, .winner = 0};
+    return (LogicReturnInfo){.next_screen = PLAYING, .winner = 0};
 }
 
 void update_score(Score* s, enum WIN_SIDE winner){
@@ -233,7 +220,6 @@ void update_score(Score* s, enum WIN_SIDE winner){
 int main(){
     srand(time(0));
 
-
     Paddle left_paddle = {0}, right_paddle = {0};
     Ball ball = {0};
     Score score = {0};
@@ -242,9 +228,8 @@ int main(){
     InitWindow(WIN_WIDTH, WIN_HEIGHT, "pong");
     SetTargetFPS(TARGET_FPS);
     
-    bool game_over = false;
     bool wait = false;
-    enum SCREEN screen = PLAYING;
+    enum SCREEN screen = GAME_OVER;
     while(!WindowShouldClose()){
         if(screen == PLAYING){
             screen = process_logic(&left_paddle, &right_paddle, &ball, &score);
@@ -254,12 +239,10 @@ int main(){
             wait = true;
         }
         render(left_paddle, right_paddle, ball, score, screen);
-        if(wait) { sleep_ms(300); wait = false; }
+        if(wait) { sleep_ms(500); wait = false; }
     }
 
     CloseWindow();
-
-    (void) game_over;
 
     return 0;
 }
