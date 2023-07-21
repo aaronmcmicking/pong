@@ -62,16 +62,19 @@ struct LogicReturnInfo{
     enum WIN_SIDE winner; // 0 if next_screen != GAME_OVER
 };
 
-Ball construct_ball();
-Paddle construct_paddle(int up_key, int down_key, enum WIN_SIDE side);
+Ball            construct_ball();
+Paddle          construct_paddle(int up_key, int down_key, enum WIN_SIDE side);
+void            init_objects(Paddle* lp, Paddle* rp, Ball* b);
 
-void init_objects(Paddle* lp, Paddle* rp, Ball* b);
+float           absf(float x);
 
-enum SCREEN process_logic(Paddle* lp, Paddle* rp, Ball* b, Score* s);
-void update_paddle(Paddle* p);
+enum SCREEN     process_logic(Paddle* lp, Paddle* rp, Ball* b, Score* s);
+void            update_paddle(Paddle* p);
 LogicReturnInfo update_ball(Ball* b, Paddle lp, Paddle rp);
-void update_score(Score* s, enum WIN_SIDE winner);
+void            update_score(Score* s, enum WIN_SIDE winner);
+float           calculate_ball_y_velocity(Ball b, Paddle p);
 
-void render(Paddle lp, Paddle rp, Ball b, Score score, enum SCREEN screen);
-void draw_score(Score s);
-void draw_centre_line();
+void	        render_debug(Score score);
+void	        render(Paddle lp, Paddle rp, Ball b, Score score, enum SCREEN screen);
+void	        draw_score(Score s);
+void	        draw_centre_line();
