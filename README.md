@@ -14,15 +14,18 @@ To exit, press `ESC`. <br>
 
 The only dependancy is [raylib](https://github.com/raysan5/raylib). If you do not
 already have it installed, follow it's 
-[install instructions for your operating system](https://github.com/raysan5/raylib/wiki#development-platforms).
+[install instructions for your operating system](https://github.com/raysan5/raylib/wiki/Working-on-GNU-Linux).
 
 ## Build and Run
 
 Ensure you have the required dependancies installed. <br>
 By default, the build scipts attempt to compile using GCC. If you wish to use another compiler,
 modify the build scripts as needed.<br>
+<br>
 
-    git clone https://github.com/aaronmcmicking/pong
+To build and run: <br>
+
+    git clone --recursive https://github.com/aaronmcmicking/pong
     cd pong
     ./build.sh
     ./pong

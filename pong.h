@@ -59,7 +59,7 @@ struct Score{
 typedef struct LogicReturnInfo LogicReturnInfo;
 struct LogicReturnInfo{
     enum SCREEN next_screen;
-    enum WIN_SIDE winner; // NULL if next_screen != GAME_OVER
+    enum WIN_SIDE winner; // 0 if next_screen != GAME_OVER
 };
 
 Ball construct_ball();
